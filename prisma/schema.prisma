@@ -6,6 +6,34 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Trip {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  User              User?    @relation(name: "trips", fields: [userId], references: [id])
+  userId            Int
+  driver            User?    @relation(name: "drives", fields: [driverId], references: [id])
+  driverId          Int
+  origin            String
+  originLngLat      Int[]
+  destination       String
+  destinationLngLat Int[]
+}
+
+model User {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  trips  Trip[] @relation("trips")
+  drives Trip[] @relation("drives")
+  role   Role   @default(RIDER)
+}
+
+enum Role {
+  DRIVER
+  RIDER
 }

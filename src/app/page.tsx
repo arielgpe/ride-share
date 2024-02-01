@@ -1,16 +1,17 @@
 'use client';
 import { ThemeProvider } from '@mui/material';
-import { Sidebar } from '@/components/organism/Sidebar';
 import theme from '../../theme';
-import { Map } from '@/components/organism/Map';
+import { SessionProvider } from 'next-auth/react';
+import Base from '@/components/organism/Base';
 
 
 export default function Home() {
   return (
     <ThemeProvider theme={theme}>
       <main className={'min-h-screen'}>
-        <Map userType={'rider'}/>
-        <Sidebar/>
+        <SessionProvider>
+          <Base/>
+        </SessionProvider>
       </main>
     </ThemeProvider>
   );

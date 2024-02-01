@@ -68,7 +68,11 @@ export default createTheme({
     },
     MuiTypography: {
       defaultProps: {
-        fontFamily: 'Inter'
+        fontFamily: [
+          'Inter',
+          'Roboto',
+          '"Helvetica Neue"',
+        ].join(','),
       },
       styleOverrides: {
         root: {

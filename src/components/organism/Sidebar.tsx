@@ -4,6 +4,9 @@ import { Box, Drawer } from '@mui/material';
 import { SidebarContent } from '@/components/molecules/SidebarContent';
 import { ISidebarItem } from '@/interfaces/ISidebarItem';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { useBoundStore } from '@/stores/useBoundStore';
 
 const mainMenu: ISidebarItem[] = [
   {
@@ -14,6 +17,7 @@ const mainMenu: ISidebarItem[] = [
 ];
 
 export const Sidebar = () => {
+
   return (
     <Box sx={{display: 'flex', bgcolor: 'bg.main'}}>
       <Drawer
@@ -56,11 +60,10 @@ export const Sidebar = () => {
           }
         })}
       >
-        <SidebarContent mainMenu={mainMenu} currentUser={{name: 'Ariel'}} isSelected={(item) => {
-          console.log('ah?', item)
+        <SidebarContent mainMenu={mainMenu} isSelected={(item) => {
           return false;
         }}/>
       </Drawer>
     </Box>
-  )
-}
+  );
+};
