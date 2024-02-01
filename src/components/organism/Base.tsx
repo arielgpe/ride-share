@@ -1,42 +1,56 @@
 'use client';
 import { Map } from '@/components/organism/Map';
 import { Sidebar } from '@/components/organism/Sidebar';
-import { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useBoundStore } from '@/stores/useBoundStore';
+import { CircularProgress } from '@mui/material';
 
 const nextUrl = process.env.NEXT_AUTH_URL;
 const Base = () => {
+  const {user, trip} = useBoundStore();
   const {data: session, status} = useSession();
+  const [showMap, setShowMap] = useState(false);
+  const [lng, setLng] = useState(-69.94193);
+  const [lat, setLat] = useState(18.49049);
+  const {data: myTrip = {}} = trip.getTrips(user.data);
 
 
-  const router = useRouter();
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   console.log("user.data", user.data)
+  //   if (!user.data.id) {
+  //     router.push('/login');
+  //   }
+  // }, [user]);
+
 
   useEffect(() => {
-    const getUser = async() => {
-      return fetch(`${nextUrl}/api/users?name=ariel`);
+    setShowMap(false);
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setLat(position.coords.latitude);
+        setLng(position.coords.longitude);
+        setShowMap(true);
+      });
     }
-
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated') {
-      getUser();
-    }
-  }, [status]);
-
+  }, [myTrip]);
 
   if (status === 'loading') {
     return <p>Loading...</p>;
   }
 
-  if (status === 'unauthenticated') {
-    return <p>Access Denied</p>;
-  }
+  // if (!user.data.id) {
+  //   return <p>Access Denied</p>;
+  // }
 
   return (
     <Fragment>
-      <Map/>
       <Sidebar/>
+      {showMap ? <Map lng={lng} lat={lat}/> : <CircularProgress
+        className={'ml-[270px] mt-3'}
+        size="1.5rem"/>}
     </Fragment>
   );
 };

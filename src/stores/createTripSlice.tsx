@@ -1,14 +1,17 @@
 import { StateCreator } from 'zustand';
 import { TripSlice } from '@/interfaces/TripSlice';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then((r: any) => r.json());
+
+const nextUrl = process.env.NEXT_AUTH_URL;
 
 export const createTripSlice: StateCreator<TripSlice> = (set, get, store) => ({
   trip: {
-    data: {
-      status: 'open'
+    getTrips: (user) => {
+      return useSWR(`${nextUrl}/api/trips?userId=${user.id}&role=${user.role}`,
+        fetcher, {refreshInterval: 1000});
     },
-    setTrip: (data) => {
-      set({trip: {...get().trip, data}});
-    }
   }
 });
 

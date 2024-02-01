@@ -1,15 +1,24 @@
-interface Trip {
+import { User } from '@/interfaces/UserSlice';
+import { SWRResponse } from 'swr';
+
+export interface Trip {
   id?: number;
-  status: 'open' | 'ongoing' | 'completed' | 'canceled'
-  rider?: number;
-  driver?: number;
-  origin?: number[];
-  destination?: number[];
+  status: string;
+  userId: number,
+  user?: User;
+  driverId?: number
+  driver?: User;
+  distance: number,
+  cost?: number,
+  driverPay?: number
+  origin?: string;
+  originLngLat?: number[];
+  destination?: string;
+  destinationLngLat?: number[];
 }
 
 interface TripData {
-  data: Partial<Trip>;
-  setTrip: (data: Trip) => void
+  getTrips: (user: Partial<User>) => SWRResponse;
 }
 
 export interface TripSlice {

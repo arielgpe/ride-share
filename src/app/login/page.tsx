@@ -1,20 +1,23 @@
 'use client';
 
-import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Stack, TextField } from '@mui/material';
+import { Button, CircularProgress, FormControl, FormControlLabel, Radio, RadioGroup, Stack, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useBoundStore } from '@/stores/useBoundStore';
+import { User } from '@/interfaces/UserSlice';
 
 const nextUrl = process.env.NEXT_AUTH_URL;
 
 const LoginPage = () => {
   const router = useRouter();
-  const { user } = useBoundStore();
+  const {user, trip} = useBoundStore();
+  const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState('RIDER');
 
   const handleLogin = async () => {
+    setLoading(true);
     const response = await signIn('credentials', {
       name: fullName.toLowerCase(),
       role: role,
@@ -22,15 +25,15 @@ const LoginPage = () => {
       redirect: false,
     });
 
-    const qq = await fetch(`${nextUrl}/api/users?name=${fullName.toLowerCase()}`) as any;
-    const data = await qq.json();
-    user.setUser(data);
+    const userResponse = await fetch(`${nextUrl}/api/users?name=${fullName.toLowerCase()}`) as any;
+    const data = await userResponse.json() as User;
 
     if (response.ok) {
+      user.setUser(data);
       router.push('/');
     }
+    setLoading(false);
   };
-
 
   return (
     <Stack
@@ -54,7 +57,12 @@ const LoginPage = () => {
           <FormControlLabel value="DRIVER" control={<Radio/>} label="Driver"/>
         </RadioGroup>
       </FormControl>
-      <Button variant="contained" disabled={fullName.length <= 0} onClick={handleLogin}>Login</Button>
+      <Button variant="contained" disabled={fullName.length <= 0 || loading} onClick={handleLogin}>
+        {loading ? (
+          <CircularProgress
+            size="1.5rem"/>
+        ) : <>Login</>}
+      </Button>
     </Stack>
   );
 };

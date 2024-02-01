@@ -1,16 +1,20 @@
-interface UserData {
-  id: number,
-  name: string,
-  role: string
+import { Trip } from '@/interfaces/TripSlice';
+
+export interface User {
+  id: number;
+  name: string;
+  role: 'RIDER' | 'DRIVER';
+  trips: Trip[];
+  drives: Trip[];
 }
 
-interface UserSliceData {
-  data: Partial<UserData>,
+interface UserData {
+  data: Partial<User>,
   access_token?: string,
   fetching: boolean,
-  setUser: (user: Partial<UserData>) => void;
+  setUser: (user: Partial<User>) => void;
 }
 
 export interface UserSlice {
-  user: UserSliceData;
+  user: UserData;
 }

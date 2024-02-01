@@ -2,19 +2,6 @@
 
 import { Box, Drawer } from '@mui/material';
 import { SidebarContent } from '@/components/molecules/SidebarContent';
-import { ISidebarItem } from '@/interfaces/ISidebarItem';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import { useSession } from 'next-auth/react';
-import { useState } from 'react';
-import { useBoundStore } from '@/stores/useBoundStore';
-
-const mainMenu: ISidebarItem[] = [
-  {
-    name: 'Trips',
-    icon: DirectionsCarIcon,
-    url: '/trips'
-  },
-];
 
 export const Sidebar = () => {
 
@@ -60,9 +47,7 @@ export const Sidebar = () => {
           }
         })}
       >
-        <SidebarContent mainMenu={mainMenu} isSelected={(item) => {
-          return false;
-        }}/>
+        <SidebarContent />
       </Drawer>
     </Box>
   );

@@ -4,34 +4,33 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import Directions from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
 import { useBoundStore } from '@/stores/useBoundStore';
+import { Trip } from '@/interfaces/TripSlice';
 
 const MapboxAccessToken = process.env.MapboxAccessToken || '';
 mapboxgl.accessToken = MapboxAccessToken;
 
+const nextUrl = process.env.NEXT_AUTH_URL;
+
 interface Props {
-  userType: 'rider' | 'driver';
+  lat: number,
+  lng: number
 }
 
-export const Map = () => {
-  const  { trip, user } = useBoundStore();
-  const [showMap, setShowMap] = useState(false);
+export const Map = ({lat, lng}: Props) => {
+  const {trip, user} = useBoundStore();
   const mapContainer = useRef(null);
   const map = useRef<any>();
-  const [lng, setLng] = useState(-69.94193);
-  const [lat, setLat] = useState(18.49049);
-  const [zoom, setZoom] = useState(13);
-
+  const [zoom, setZoom] = useState(9);
+  const {data = {}, isLoading} = trip.getTrips(user.data);
 
   const options = () => {
     const defaultOptions = {
       profile: 'mapbox/driving',
       accessToken: mapboxgl.accessToken,
-      geocoder: {
-        country: 'DO'
-      },
       controls: {}
     };
-    return user.data.role === 'RIDER' ? {
+
+    return user.data.role === 'RIDER' && (!data || !['open', 'ongoing'].includes(data.status)) ? {
       ...defaultOptions,
       controls: {
         profileSwitcher: false,
@@ -49,46 +48,94 @@ export const Map = () => {
     };
   };
 
-  const getGeolocation = () => {
-    if ("geolocation" in navigator) {
-      /* geolocation is available */
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log("position", position);
-      });
+  const startTrip = async (origin: number[], destination: number[]) => {
+    const response = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origin.join(',')};${destination.join(',')}?steps=true&geometries=geojson&access_token=${MapboxAccessToken}`);
+    const route = await response.json() as any;
+    if (route.code === 'Ok') {
+      const body: Trip = {
+        status: 'open',
+        userId: user.data.id ?? 0,
+        distance: route.routes[0].distance,
+        origin: route.waypoints[0].name,
+        originLngLat: route.waypoints[0].location,
+        destination: route.waypoints[1].name,
+        destinationLngLat: route.waypoints[1].location
+      };
+
+      const tripResponse = await fetch(`${nextUrl}/api/trips`, {method: 'POST', body: JSON.stringify(body)}) as any;
+      if (tripResponse.ok === true) {
+        await tripResponse.json();
+      }
+    }
+  };
+
+  class TripButton {
+    directions = null;
+    destination = [];
+    origin = [];
+
+    constructor(directions: any) {
+      directions.on('destination', (value: any) => this.destination = value.feature.geometry.coordinates);
+      directions.on('origin', (value: any) => this.origin = value.feature.geometry.coordinates);
+      this.directions = directions;
+    }
+
+    onAdd(map) {
+      const div = document.createElement('div');
+      div.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+      div.innerHTML = `<button style='width: 260px'> Start Ride </button>`;
+      div.addEventListener('contextmenu', (e) => e.preventDefault());
+      div.addEventListener('click', () => startTrip(this.origin, this.destination));
+      return div;
     }
   }
 
-  useEffect(() => {
-    if (map.current) return; // initialize map only once
-    // getGeolocation();
+  const getGeolocation = () => {
+    const coordinates = [lng, lat];
+    if (map.current) return;
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [lng, lat],
+      center: coordinates,
       zoom: zoom
     });
-    const directions = new Directions(options());
-    directions.setOrigin([lng, lat]);
-    directions.setWaypoint(0, [-69.93783,18.48324]);
-    directions.setDestination([-69.95088,18.47713])
+    map.current.on('load', () => {
+      const directions = new Directions(options());
+      if (data && data.status) {
+        if (['open', 'ongoing'].includes(data.status)) {
+          if (user.data.role === 'DRIVER') {
+            directions.setOrigin(coordinates);
+            directions.setWaypoint(0, data.originLngLat?.map(Number));
+          } else {
+            directions.setOrigin(data.originLngLat?.map(Number));
+          }
+          directions.setDestination(data.destinationLngLat?.map(Number));
+        }
+      } else {
+        if (user.data.role === 'RIDER') {
+          const button = new TripButton(directions);
+          map.current.addControl(
+            button,
+            'top-left'
+          );
+        }
+      }
 
+      map.current.addControl(
+        directions,
+        'top-left'
+      );
 
-    // directions.setWaypoint(1, [lat, lng]);
-    // directions.addWaypoint(2, [lat, lng]);
-    map.current.addControl(
-      directions,
-      'top-left'
-    );
-
-    trip.setTrip({
-      id: 0,
-      status: 'ongoing',
-      rider: 0,
-      driver: 2,
-      origin: [lng, lat],
-      destination: [-69.95088,18.47713]
     });
-  }, []);
+
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      getGeolocation();
+    }
+  }, [isLoading]);
 
 
   return (
