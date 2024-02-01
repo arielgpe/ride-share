@@ -9,7 +9,7 @@ const nextUrl = process.env.NEXT_AUTH_URL;
 export const createTripSlice: StateCreator<TripSlice> = (set, get, store) => ({
   trip: {
     getTrips: (user) => {
-      return useSWR(`${nextUrl}/api/trips?userId=${user.id}&role=${user.role}`,
+      return useSWR((user.id && user.role) ? [`${nextUrl}/api/trips?userId=${user.id}&role=${user.role}`] : null,
         fetcher, {refreshInterval: 1000});
     },
   }
