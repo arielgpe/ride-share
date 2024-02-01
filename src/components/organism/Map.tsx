@@ -135,7 +135,7 @@ export const Map = ({lat, lng}: Props) => {
     if (!isLoading) {
       getGeolocation();
     }
-  }, [isLoading]);
+  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   return (

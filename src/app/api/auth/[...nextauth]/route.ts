@@ -2,6 +2,7 @@ import NextAuth, { Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '@/lib/prisma';
 import { JWT } from 'next-auth/jwt';
+import { AdapterUser } from 'next-auth/adapters';
 
 const handler = NextAuth({
     providers: [
@@ -22,7 +23,7 @@ const handler = NextAuth({
               name: credentials?.name,
             }
           });
-          if (!user) {
+          if (!user && credentials) {
             user = await prisma.user.create({
               data: {
                 name: credentials?.name,
@@ -47,7 +48,7 @@ const handler = NextAuth({
       maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     callbacks: {
-      async session(session: Session, user: User, token: JWT) {
+      async session(session: Session, user: AdapterUser, token: JWT) {
         if (user !== null) {
 
           session.user = user;
