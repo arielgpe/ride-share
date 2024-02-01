@@ -5,26 +5,24 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useBoundStore } from '@/stores/useBoundStore';
 import { CircularProgress } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 const nextUrl = process.env.NEXT_AUTH_URL;
 const Base = () => {
-  const {user, trip} = useBoundStore();
+  const router = useRouter();
+
+  const {user, trip, _hasHydrated} = useBoundStore();
   const {data: session, status} = useSession();
   const [showMap, setShowMap] = useState(false);
   const [lng, setLng] = useState(-69.94193);
   const [lat, setLat] = useState(18.49049);
   const {data: myTrip = {}} = trip.getTrips(user.data);
 
-
-  // const router = useRouter();
-
-  // useEffect(() => {
-  //   console.log("user.data", user.data)
-  //   if (!user.data.id) {
-  //     router.push('/login');
-  //   }
-  // }, [user]);
-
+  useEffect(() => {
+    if (_hasHydrated && !user.data.hasOwnProperty('id')) {
+      router.push('/login');
+    }
+  }, [user]);
 
   useEffect(() => {
     setShowMap(false);
