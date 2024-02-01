@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
+First, install the npm modules (using Node v18.17.5)
+```bash
+npm install or npm ci
+```
+
+then initiate the postgres db with the prisma migrations (only do this if the db has not been initialized)
+
+```bash
+npm run prisma-migrate
+```
+
+Then run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Production site hosted at [https://ride-share-ten.vercel.app/](https://ride-share-ten.vercel.app/)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+The app is build with Nextjs, Mapbox for the map layer, Prisma for the ORM, Postgres, Mui and Tailwindcss for the styling and swr for data-fetching.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For this app I decided to go with Prisma and Vercel Postgres from the get go, which was probably not a great idea since I needed the real time data,
+Supabase or firebase would have been better alternatives. Currently, the app is handling the freshness of the data with SWR pooling, which works fine for an app of this small scale but still.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+I used Mapbox since I was already familiar with it. Sadly, the Directions controls are not compatible with react-mapbox-gl so I had to use standard mapbox-gl library, with more time, 
+I probably would have made a directions library for react-mapbox-gl.
+This mapbox issue sadly causes the app to redraw every time there's a direction change, since it cannot update based on states.
 
-## Deploy on Vercel
+There's no authentication per se, but the app does force you to set a name and a role, keep in mind that the role + name selection only matters the first time, you cannot change your role.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+I kept the design very simple, ideally I would have liked to have all the app functionality as controls on top of mapbox but time constraints didn't permit it.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+It took me about 7-8hrs of development time to complete the task Tuesday Jan 30, to Thursday Feb 1.
