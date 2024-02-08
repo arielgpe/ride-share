@@ -10,7 +10,7 @@ export const createTripSlice: StateCreator<TripSlice> = (set, get, store) => ({
   trip: {
     getTrips: (user) => {
       return useSWR((user && user.id && user.role) ? [`${nextUrl}/api/trips?userId=${user.id}&role=${user.role}`] : null,
-        fetcher, {refreshInterval: 1000});
+        fetcher, {refreshInterval: 2500});
     },
   }
 });

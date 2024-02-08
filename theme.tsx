@@ -34,6 +34,11 @@ export default createTheme({
     },
   },
   palette: {
+    primary: {
+      light: "#D40753",
+      main: "#B70648",
+      dark: "#860435"
+    },
     white: {
       main: '#FFFFFF',
       light: '#FFFFFF',

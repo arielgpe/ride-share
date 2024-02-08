@@ -28,7 +28,7 @@ const LoginPage = () => {
     const userResponse = await fetch(`${nextUrl}/api/users?name=${fullName.toLowerCase()}`) as any;
     const data = await userResponse.json() as User;
 
-    if (response.ok) {
+    if (response?.ok) {
       user.setUser(data);
       router.push('/');
     }
@@ -37,10 +37,7 @@ const LoginPage = () => {
 
   return (
     <Stack
-      component="form"
       spacing={2}
-      noValidate
-      autoComplete="off"
     >
       <TextField
         label="Full name" name="name" value={fullName} onChange={(e) => setFullName(e.target.value)}/>
