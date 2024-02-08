@@ -1,8 +1,8 @@
 import { Trip } from '@/interfaces/TripSlice';
 
 export enum Role {
-  DRIVER,
-  RIDER
+  DRIVER = 'DRIVER',
+  RIDER = 'RIDER'
 }
 
 export interface User {

@@ -7,7 +7,7 @@ import useSWR from 'swr';
 const nextUrl = process.env.NEXT_AUTH_URL;
 const fetcher = (url: string) => fetch(url).then((r: any) => r.json());
 
-export const SidebarListItem = () => {
+export const SidebarListItems = () => {
   const {user, trip} = useBoundStore();
   const {data: myTrip = {}} = trip.getTrips(user.data);
 
@@ -24,13 +24,12 @@ export const SidebarListItem = () => {
     }
   };
 
-
   if ((myTrip && myTrip.status && myTrip.status !== 'canceled') || user.data.role === 'RIDER') {
     return;
   }
 
   return (
-    <List>
+    <List sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper', height: '100%', overflowY: 'auto'}}>
       {data.length > 0 ? data.map((item: any, index: number) => (
         <ListItem key={index + 1} sx={{color: 'primary'}}>
           <ListItemButton onClick={() => selectTrip(item)}>
