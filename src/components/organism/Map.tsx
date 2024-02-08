@@ -102,7 +102,7 @@ export const Map = () => {
   };
 
   const startTrip = async (origin: number[], destination: number[]) => {
-    const response = await fetcher(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origin.join(',')};${destination.join(',')}&geometries=geojson&access_token=${MapboxAccessToken}`) as any;
+    const response = await fetcher(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origin.join(',')};${destination.join(',')}?geometries=geojson&access_token=${MapboxAccessToken}`) as any;
     if ('routes' in response) {
       const body: Trip = {
         status: 'open',
