@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+}
+
+
+/*.mapboxgl-ctrl-geocoder {*/
+/*  @apply absolute w-full left-12 top-4 ml-3;*/
+/*  z-index: 1;*/
+/*}*/
