@@ -1,5 +1,5 @@
-import { Button, Divider, List, ListItem, ListItemAvatar, ListItemText, Stack, Typography } from '@mui/material';
-import { Fragment } from 'react';
+import { Divider, List, ListItem, ListItemAvatar, ListItemText, Stack, Typography } from '@mui/material';
+import { Fragment, useState } from 'react';
 import TurnLeftIcon from '@mui/icons-material/TurnLeft';
 import TurnSlightLeftIcon from '@mui/icons-material/TurnSlightLeft';
 import TurnRightIcon from '@mui/icons-material/TurnRight';
@@ -8,12 +8,14 @@ import StraightIcon from '@mui/icons-material/Straight';
 import { User } from '@/interfaces/UserSlice';
 import { Trip } from '@/interfaces/TripSlice';
 import { useBoundStore } from '@/stores/useBoundStore';
+import { LoadingButton } from '@/components/atoms/LoadingButton';
 
 const nextUrl = process.env.NEXT_AUTH_URL;
 
 export const DirectionsControl = ({data = null, user, onCancel}: { data: any, user: Partial<User>, onCancel: () => void}) => {
   const {trip} = useBoundStore();
-  const {data: tripData = {}, isLoading} = trip.getTrips(user);
+  const {data: tripData = {}} = trip.getTrips(user);
+  const [isCancelLoading, setCancelIsLoading] = useState(false);
 
   const duration = (value: number) => Math.floor(value / 60);
   const distance = (value: number) => Math.floor(value);
@@ -34,6 +36,7 @@ export const DirectionsControl = ({data = null, user, onCancel}: { data: any, us
   };
 
   const cancelTrip = async (item: Trip) => {
+    setCancelIsLoading(true)
     let body: any = {id: item.id, status: 'canceled'};
     if (user.role === 'DRIVER') {
       body = {id: item.id, driver: {disconnect: true}, status: 'open'};
@@ -43,6 +46,7 @@ export const DirectionsControl = ({data = null, user, onCancel}: { data: any, us
       onCancel();
       await tripResponse.json();
     }
+    setCancelIsLoading(false)
   };
 
   return (
@@ -67,8 +71,8 @@ export const DirectionsControl = ({data = null, user, onCancel}: { data: any, us
 
                   </Fragment>
                 )}
-                <Button sx={{alignSelf: 'end'}} variant={'outlined'} color={'error'} onClick={() => cancelTrip(tripData)}>Cancel
-                  Trip</Button>
+                <LoadingButton loading={isCancelLoading} sx={{alignSelf: 'end'}} variant={'outlined'} color={'error'} onClick={() => cancelTrip(tripData)}>Cancel
+                  Trip</LoadingButton>
 
               </Stack> : <Typography>No ongoing trips</Typography>
             }

@@ -1,17 +1,18 @@
 'use client';
 
-import { Button, CircularProgress, FormControl, FormControlLabel, Radio, RadioGroup, Stack, TextField } from '@mui/material';
+import { FormControl, FormControlLabel, Radio, RadioGroup, Stack, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useBoundStore } from '@/stores/useBoundStore';
 import { User } from '@/interfaces/UserSlice';
+import { LoadingButton } from '@/components/atoms/LoadingButton';
 
 const nextUrl = process.env.NEXT_AUTH_URL;
 
 const LoginPage = () => {
   const router = useRouter();
-  const {user, trip} = useBoundStore();
+  const {user} = useBoundStore();
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState('RIDER');
@@ -54,12 +55,9 @@ const LoginPage = () => {
           <FormControlLabel value="DRIVER" control={<Radio/>} label="Driver"/>
         </RadioGroup>
       </FormControl>
-      <Button variant="contained" disabled={fullName.length <= 0 || loading} onClick={handleLogin}>
-        {loading ? (
-          <CircularProgress
-            size="1.5rem"/>
-        ) : <>Login</>}
-      </Button>
+      <LoadingButton  loading={loading} variant="contained" disabled={fullName.length <= 0 || loading} onClick={handleLogin}>
+        Login
+      </LoadingButton>
     </Stack>
   );
 };

@@ -4,6 +4,8 @@ import './globals.css';
 import { ReactNode } from 'react';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import { Analytics } from '@vercel/analytics/react';
+import theme from '../../theme';
+import { ThemeProvider } from '@mui/material';
 
 const inter = Inter({subsets: ['latin']});
 
@@ -21,10 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AppRouterCacheProvider>
-          {children}
-          <Analytics />
-        </AppRouterCacheProvider>
+        <ThemeProvider theme={theme}>
+
+          <AppRouterCacheProvider>
+            {children}
+            <Analytics />
+          </AppRouterCacheProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

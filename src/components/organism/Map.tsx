@@ -17,11 +17,11 @@ import { GeolocateResultEvent } from 'react-map-gl/dist/esm/types';
 import { GeocoderControl } from './GeocoderControl';
 import { DirectionsControl } from '@/components/organism/DirectionsControl';
 import { AccountControl } from '@/components/organism/AccountControl';
-import { Button } from '@mui/material';
 import RoomIcon from '@mui/icons-material/Room';
 import HailIcon from '@mui/icons-material/Hail';
 import { Trip } from '@/interfaces/TripSlice';
 import { SidebarListItems } from '@/components/molecules/SidebarItems';
+import { LoadingButton } from '@/components/atoms/LoadingButton';
 
 const MapboxAccessToken = process.env.MapboxAccessToken || '';
 const nextUrl = process.env.NEXT_AUTH_URL;
@@ -40,7 +40,9 @@ const userLayerStyle: LineLayer = {
 
 export const Map = () => {
   const {trip, user} = useBoundStore();
-  const {data = {}, isLoading} = trip.getTrips(user.data);
+  const {data = {}} = trip.getTrips(user.data);
+
+  const [isStartTripLoading, setIsStartTripLoading] = useState(false);
 
   const geoControlRef = useRef<mapboxgl.GeolocateControl>();
 
@@ -102,6 +104,7 @@ export const Map = () => {
   };
 
   const startTrip = async (origin: number[], destination: number[]) => {
+    setIsStartTripLoading(true);
     const response = await fetcher(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origin.join(',')};${destination.join(',')}?geometries=geojson&access_token=${MapboxAccessToken}`) as any;
     if ('routes' in response) {
       const body: Trip = {
@@ -119,6 +122,7 @@ export const Map = () => {
         await tripResponse.json();
       }
     }
+    setIsStartTripLoading(false);
   };
 
   return (
@@ -163,10 +167,10 @@ export const Map = () => {
                   setDestinationLngLat(e.result.geometry.coordinates);
                 }} placeholder={'Where to'} position="top-left"/> : null}
               {originLngLat.length > 0 && destinationLngLat.length > 0 ?
-                <Button onClick={() => startTrip(originLngLat, destinationLngLat)} variant={'contained'} sx={{
+                <LoadingButton loading={isStartTripLoading} onClick={() => startTrip(originLngLat, destinationLngLat)} variant={'contained'} sx={{
                   position: 'absolute', top: '3.5rem',
                   right: '9rem'
-                }}>Start Trip</Button> : null}
+                }}>Start Trip</LoadingButton> : null}
             </Fragment> : null
         }
 
