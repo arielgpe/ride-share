@@ -12,7 +12,11 @@ import { LoadingButton } from '@/components/atoms/LoadingButton';
 
 const nextUrl = process.env.NEXT_AUTH_URL;
 
-export const DirectionsControl = ({data = null, user, onCancel}: { data: any, user: Partial<User>, onCancel: () => void}) => {
+export const DirectionsControl = ({data = null, user, onCancel}: {
+  data: any,
+  user: Partial<User>,
+  onCancel: () => void
+}) => {
   const {trip} = useBoundStore();
   const {data: tripData = {}} = trip.getTrips(user);
   const [isCancelLoading, setCancelIsLoading] = useState(false);
@@ -36,7 +40,7 @@ export const DirectionsControl = ({data = null, user, onCancel}: { data: any, us
   };
 
   const cancelTrip = async (item: Trip) => {
-    setCancelIsLoading(true)
+    setCancelIsLoading(true);
     let body: any = {id: item.id, status: 'canceled'};
     if (user.role === 'DRIVER') {
       body = {id: item.id, driver: {disconnect: true}, status: 'open'};
@@ -46,7 +50,7 @@ export const DirectionsControl = ({data = null, user, onCancel}: { data: any, us
       onCancel();
       await tripResponse.json();
     }
-    setCancelIsLoading(false)
+    setCancelIsLoading(false);
   };
 
   return (
@@ -71,7 +75,8 @@ export const DirectionsControl = ({data = null, user, onCancel}: { data: any, us
 
                   </Fragment>
                 )}
-                <LoadingButton loading={isCancelLoading} sx={{alignSelf: 'end'}} variant={'outlined'} color={'error'} onClick={() => cancelTrip(tripData)}>Cancel
+                <LoadingButton loading={isCancelLoading} sx={{alignSelf: 'end'}} variant={'outlined'} color={'error'}
+                               onClick={() => cancelTrip(tripData)}>Cancel
                   Trip</LoadingButton>
 
               </Stack> : <Typography>No ongoing trips</Typography>

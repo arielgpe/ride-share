@@ -15,7 +15,7 @@ const Base = () => {
     if (_hasHydrated && !user.data.hasOwnProperty('id')) {
       router.push('/login');
     }
-  }, [user]);
+  }, [user, _hasHydrated]);
 
   if (status === 'loading') {
     return <p>Loading...</p>;
