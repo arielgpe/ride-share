@@ -3,9 +3,11 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ReactNode } from 'react';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
-import { Analytics } from '@vercel/analytics/react';
 import theme from '../../theme';
 import { ThemeProvider } from '@mui/material';
+import { GoogleAnalytics } from '@next/third-parties/google'
+
+const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID || '';
 
 const inter = Inter({subsets: ['latin']});
 
@@ -27,9 +29,9 @@ export default function RootLayout({
 
           <AppRouterCacheProvider>
             {children}
-            <Analytics />
           </AppRouterCacheProvider>
         </ThemeProvider>
+        <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
       </body>
     </html>
   );
