@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import theme from '../../theme';
 import { ThemeProvider } from '@mui/material';
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID || '';
 
@@ -24,15 +24,15 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ThemeProvider theme={theme}>
+    <body className={inter.className}>
+    <ThemeProvider theme={theme}>
 
-          <AppRouterCacheProvider>
-            {children}
-          </AppRouterCacheProvider>
-        </ThemeProvider>
-        <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
-      </body>
+      <AppRouterCacheProvider>
+        {children}
+      </AppRouterCacheProvider>
+    </ThemeProvider>
+    <GoogleAnalytics gaId={GA_MEASUREMENT_ID}/>
+    </body>
     </html>
   );
 }
